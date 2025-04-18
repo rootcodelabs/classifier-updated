@@ -54,8 +54,7 @@ services:
     volumes:
       - ./DSL:/data
       - ./DSL/DMapper/classifier/hbs:/workspace/app/views/classifier
-      - ./DSL/DMapper/classifier/js:/workspace/app/js/classifier
-      # - ./DSL/DMapper/lib:/workspace/app/lib
+      - ./DSL/DMapper/classifier/lib:/workspace/app/lib
     ports:
       - 3000:3000
     networks:
@@ -69,6 +68,7 @@ services:
       - tim-postgresql
     environment:
       - SECURITY_ALLOWLIST_JWT=ruuter-private,ruuter-public,data-mapper,resql,tim,tim-postgresql,chat-widget,authentication-layer,127.0.0.1,::1
+      - KEY_PASS=ppjjpp
     ports:
       - 8085:8085
     networks:
@@ -144,7 +144,7 @@ services:
       - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://users_db:5432/classifier #For LocalDb Use
       # sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5433/byk?sslmode=require
       - sqlms.datasources.[0].username=postgres
-      - sqlms.datasources.[0].password=admin
+      - sqlms.datasources.[0].password=dbadmin
       - logging.level.org.springframework.boot=INFO
     ports:
       - 8082:8082
@@ -159,7 +159,7 @@ services:
     image: postgres:14.1
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=admin
+      - POSTGRES_PASSWORD=dbadmin
       - POSTGRES_DB=classifier
     ports:
       - 5433:5432
@@ -213,7 +213,7 @@ services:
       - shared-volume:/shared
     environment:
       - UPLOAD_DIRECTORY=/shared
-      - RUUTER_PRIVATE_URL=http://ruuter-private:8088
+      - RUUTER_PRIVATE_URL=http://ruuter-private:8088/classifier
       - S3_FERRY_URL=http://s3-ferry:3000/v1/files/copy
       - IMPORT_STOPWORDS_URL=http://ruuter-private:8088/classifier/datasetgroup/update/stop-words
       - DELETE_STOPWORDS_URL=http://ruuter-private:8088/classifier/datasetgroup/delete/stop-words
@@ -255,7 +255,7 @@ services:
       dockerfile: Dockerfile
     container_name: dataset-processor
     environment:
-      - RUUTER_PRIVATE_URL=http://ruuter-private:8088
+      - RUUTER_PRIVATE_URL=http://ruuter-private:8088/classifier
       - GET_VALIDATION_SCHEMA=http://ruuter-private:8088/classifier/datasetgroup/schema
       - FILE_HANDLER_DOWNLOAD_JSON_URL=http://file-handler:8000/datasetgroup/data/download/json
       - FILE_HANDLER_DOWNLOAD_LOCATION_JSON_URL=http://file-handler:8000/datasetgroup/data/download/json/location
@@ -292,7 +292,7 @@ services:
       - shared-volume:/shared
     environment:
       - UPLOAD_DIRECTORY=/shared
-      - RUUTER_PRIVATE_URL=http://ruuter-private:8088
+      - RUUTER_PRIVATE_URL=http://ruuter-private:8088/classifier
       - S3_FERRY_URL=http://s3-ferry:3000/v1/files/copy
       - JIRA_MODEL_DOWNLOAD_DIRECTORY=/shared/models/jira
       - OUTLOOK_MODEL_DOWNLOAD_DIRECTORY=/shared/models/outlook
@@ -325,7 +325,7 @@ services:
       - shared-volume:/shared
     environment:
       - UPLOAD_DIRECTORY=/shared
-      - RUUTER_PRIVATE_URL=http://ruuter-private:8088
+      - RUUTER_PRIVATE_URL=http://ruuter-private:8088/classifier
       - S3_FERRY_URL=http://s3-ferry:3000/v1/files/copy
       - JIRA_MODEL_DOWNLOAD_DIRECTORY=/shared/models/jira
       - OUTLOOK_MODEL_DOWNLOAD_DIRECTORY=/shared/models/outlook
@@ -374,7 +374,7 @@ services:
       - shared-volume:/shared
     environment:
       - UPLOAD_DIRECTORY=/shared
-      - RUUTER_PRIVATE_URL=http://ruuter-private:8088
+      - RUUTER_PRIVATE_URL=http://ruuter-private:8088/classifier
       - S3_FERRY_URL=http://s3-ferry:3000/v1/files/copy
       - JIRA_MODEL_DOWNLOAD_DIRECTORY=/shared/models/jira
       - OUTLOOK_MODEL_DOWNLOAD_DIRECTORY=/shared/models/outlook
@@ -483,18 +483,18 @@ services:
         ipv4_address: 172.25.0.21
 
 
-  # Uncomment below container if you wish to debug progress bar sessions in opensearch dashboard
-  # opensearch-dashboards:
-  #     image: opensearchproject/opensearch-dashboards:2.11.1
-  #     container_name: opensearch-dashboards
-  #     environment:
-  #       - OPENSEARCH_HOSTS=http://opensearch-node:9200
-  #       - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
-  #     ports:
-  #       - 5601:5601
-  #     networks:
-  #       bykstack:
-  #         ipv4_address: 172.25.0.24
+  #Uncomment below container if you wish to debug progress bar sessions in opensearch dashboard
+  opensearch-dashboards:
+      image: opensearchproject/opensearch-dashboards:2.11.1
+      container_name: opensearch-dashboards
+      environment:
+        - OPENSEARCH_HOSTS=http://opensearch-node:9200
+        - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
+      ports:
+        - 5601:5601
+      networks:
+        bykstack:
+          ipv4_address: 172.25.0.24
 
 
 
